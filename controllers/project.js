@@ -1,5 +1,6 @@
 
 const Project = require("../models/project");
+const fs = require('fs');
 
 var controller = {
     home: function(req, res){
@@ -95,9 +96,27 @@ var controller = {
         var filename = 'Imagen no subida...';
 
         if(req.files){
-            return res.status(200).send({
-                files: req.files
-            });
+            var filepath = req.files.image.path;
+            var fileSplit = filepath.split('\\');
+            var filename = fileSplit[1]
+            var extsplit = filename.split('\.');
+            var fileext = extsplit[1];
+
+            if (fileext == 'png' || fileext == 'jpg' || fileext == 'jpeg' || fileext == 'gif') {
+                Project.findByIdAndUpdate(projectId, {image: filename},{new:true}, (err, projectUpdated)=>{
+                    if (err) return res.status(200).send({message: 'La imagen no se ha subido'});
+    
+                    if(!projectUpdated) return res.status(404).send({message:'El proyecto no existe'});
+                    
+                    return res.status(200).send({
+                        files: filename
+                    });
+                });
+            }else{
+                fs.unlink(filepath, (err)=>{
+                    return res.status(200).send({message: 'La extension no es valida'});
+                });
+            }
         }else{
             return res.status(404).send({
                 files: filename
