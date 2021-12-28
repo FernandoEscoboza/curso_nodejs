@@ -43,7 +43,7 @@ var controller = {
 
         if(projectid == null  ) return res.status(404).send({message: 'Proyecto no existe'});
 
-        Project.findById(projecid, (err, proj) =>{
+        Project.findById(projectid, (err, proj) =>{
             if(err) return res.status(500).send({message: 'Error a devolver los datos'});   
 
             if(pj) return res.status(404).send({message: 'Proyecto no existe'});
@@ -82,13 +82,29 @@ var controller = {
         Project.findByIdAndDelete(projectId, (err, projectRemoved)=>{
             if(err) return res.status(404).send({message: 'NO se ha borrado ningun registro'});
 
-            if(!projectRemove) return res.status(500).send({message: 'No se puede borrar'});
+            if(!projectRemoved) return res.status(500).send({message: 'No se puede borrar'});
 
             return res.status(200).send({
                 project: projectRemoved
             });
         });
+    },
+
+    uploadimage: function (req, res) {
+        var projectId = req.params.id;
+        var filename = 'Imagen no subida...';
+
+        if(req.files){
+            return res.status(200).send({
+                files: req.files
+            });
+        }else{
+            return res.status(404).send({
+                files: filename
+            });
+        }
     }
+
 }
 
 module.exports = controller;
